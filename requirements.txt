@@ -1,0 +1,17 @@
+pdfplumber>=0.11
+pandas>=2.0
+reportlab>=4.0
+matplotlib>=3.8
+requests>=2.31
+pymupdf>=1.24
+pywin32
+beautifulsoup4
+dotenv
+langchain
+langchain-text-splitters
+pymupdf
+pdfplumber
+langgraph
+langchain-core
+chainlit
+openpyxl

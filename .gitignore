@@ -1,0 +1,17 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment variables
+.env
+
+#downloaded files 
+kb_store/
+
+# OS / Editor
+run_history.db
