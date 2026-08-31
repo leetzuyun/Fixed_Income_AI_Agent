@@ -1,5 +1,5 @@
 # 金交處 AI Agent
-因應公司需求，以 Spade 的 OpenAI LLM 作為主要使用的語言模型，設計處內各部門所需的 agent 功能。    
+因應公司需求，以 公司內部 的 OpenAI LLM 作為主要使用的語言模型，設計處內各部門所需的 agent 功能。    
 目前開發進度如下：  
 1. 市場晨報 agent - 工作流以及內容**品管**
 2. 法規資料庫問答 agent - 已建立資料庫以及問答 skill  
@@ -19,7 +19,7 @@ pip install -r requirements.txt
 ### 自行設定 API key
 在 infra/ 檔案夾中建立一個檔案 .env，範例如下：
 ```
-OPENAI_API_KEY = "your_open_api_key" # default from SPADE
+OPENAI_API_KEY = "your_open_api_key" # default from INTERNAL SOURCE
 GEMINI_API_KEY = " your_gemini_api_key" # 預設不會用到
 ```
 ### 切換使用模型
