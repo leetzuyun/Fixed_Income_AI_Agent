@@ -9,7 +9,6 @@ venv/
 
 # Environment variables
 .env
-.chainlit/
 
 #downloaded files 
 kb_store/
