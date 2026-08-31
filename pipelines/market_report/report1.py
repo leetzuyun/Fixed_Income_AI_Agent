@@ -3,7 +3,7 @@ pipelines/market_report/report1.py
 Builds the final PDF report: title page, the two synthesized sections,
 optional charts, then embedded source images as an appendix.
 
-搬家後的改動（只有這兩處，其餘邏輯完全不變）：
+搬家後的改動：
   1. `import config` -> `import infra.config as config`
   2. _FONT_PATH / _BOLD_FONT_PATH / DEFAULT_BOND_REVIEW_PATH 原本用
      os.path.dirname(os.path.abspath(__file__)) 算路徑，是假設這支檔案

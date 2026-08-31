@@ -1,14 +1,29 @@
-# Welcome to Chainlit! 🚀🤖
+# 歡迎使用金交處助理！ 🚀
 
-Hi there, Developer! 👋 We're excited to have you on board. Chainlit is a powerful tool designed to help you prototype, debug and share applications built on top of LLMs.
 
-## Useful Links 🔗
+## 網站連結 🔗
 
-- **Documentation:** Get started with our comprehensive [Chainlit Documentation](https://docs.chainlit.io) 📚
-- **Discord Community:** Join our friendly [Chainlit Discord](https://discord.gg/k73SQ3FyUh) to ask questions, share your projects, and connect with other developers! 💬
+- **檔案：** 有關這個網頁的資訊請見 [Chainlit Documentation](https://docs.chainlit.io) 📚
+- **開發者頁面：**若有問題可以至 [Fixed Income AI Agent](https://github.com/leetzuyun/Fixed_Income_AI_Agent.git) 回報
 
-We can't wait to see what you create with Chainlit! Happy coding! 💻😊
+## 助理功能
 
-## Welcome screen
+1. market_report
+- 產出晨報(可以指定日期)
+- 查詢產出歷史
+- 查詢產出進度
+*注意：此 agent 的資料來源為本機 outlook，待正式使用公機操作時會更改資料來源*
 
-To modify the welcome screen, edit the `chainlit.md` file at the root of your project. If you do not want a welcome screen, just leave this file empty.
+2. regulation_wiki
+- 查詢法規資料庫
+
+## 待開發
+1. market_report
+- 資料來源
+- 數據分析圖表(目前是預設的範例)
+- 報告格式(尚未確認)
+2. regulation_wiki
+- 是否需要新增出題功能？
+3. CB Agent
+- 確認需求
+- 取得資料來源

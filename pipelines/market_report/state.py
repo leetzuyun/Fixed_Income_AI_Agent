@@ -26,3 +26,4 @@ class MarketReportState(TypedDict, total=False):
 
     chart_paths: list
     output_path: Optional[str]
+    downloads_path: Optional[str]  # 複製到執行者下載資料夾的副本路徑，失敗則為 None

@@ -22,15 +22,10 @@ agent.invoke() 完整跑完後，再把回傳的 messages 列表裡「這一輪�
     chainlit run orchestrator/chainlit_app.py
 
 預設只能在這台電腦上用瀏覽器開 http://localhost:8000。
-如果想讓同一區網內的同事也能連，加 --host 0.0.0.0：
-    chainlit run orchestrator/chainlit_app.py --host 0.0.0.0 --port 8000
+如果想讓同一區網內的同事也能連，加 --host 128.110.135.25：
+    chainlit run orchestrator/chainlit_app.py --host 128.110.135.25 --port 8000
 然後同事瀏覽器輸入「這台電腦的區網 IP:8000」（IP 可用 ipconfig 查）。
 Windows 防火牆可能會跳出詢問是否允許，記得允許。
-
-背景觸發的晨報流程（trigger_daily_report）跟 Streamlit 版一樣，是綁在
-這個 `chainlit run` 的 process 上，不是綁在同事的瀏覽器分頁——同事關掉
-分頁不影響背景流程，但如果你把整個 chainlit run 的終端機視窗關掉，流
-程會跟著中斷。
 
 如果想加密碼保護（同事以外的人在同網段也連得到，不想讓所有人都能
 用），Chainlit 支援內建的密碼／OAuth 驗證，需要另外設定
@@ -68,7 +63,7 @@ async def on_chat_start():
     cl.user_session.set("history", [])
     await cl.Message(
         content=(
-            "🤖 金交處助理已啟動。可以問晨報狀態、觸發今天的報告，"
+            "金交處助理已啟動。可以問晨報狀態、觸發今天的報告，"
             "或問法規／知識庫裡的內容。"
         )
     ).send()
