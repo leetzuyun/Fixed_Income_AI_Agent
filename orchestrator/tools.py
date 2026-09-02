@@ -17,6 +17,7 @@ import infra.status_store as status
 from pipelines.market_report.runner import run_pipeline
 import domains._shared.rag_store as rag_store
 import domains.regulation_kb.wiki_reader as regulation_wiki
+import domains.underwriting_kb.store as underwriting_store
 
 
 @tool
@@ -93,6 +94,31 @@ def read_regulation_source(source_filename: str) -> str:
     return content or f"找不到來源檔案：{source_filename}"
 
 
+@tool
+def list_underwriters_market_share(year: str = None) -> list:
+    """列出承銷商在指定年度的承銷案件數、台幣計價金額總計、市占率。year
+    用民國年字串（例如 "115"），不填則統計資料庫裡的全部年度。市占率只
+    計算幣別為 TWD 的案件，非台幣計價的案件不納入分母（沒有匯率換算資
+    料，直接加總會失真），用 excluded_non_twd_count 標示這家承銷商有幾
+    筆案件被排除在市占率計算外，回答時如果有排除筆數應該提醒使用者。"""
+    return underwriting_store.list_underwriters(year=year)
+
+
+@tool
+def search_underwriting_bonds(keyword: str) -> list:
+    """依債券名稱或發行人關鍵字搜尋承銷公告資料庫，回傳符合的案件清單
+    （公告序號、申報日期、案件名稱、承銷商、金額、幣別）。"""
+    return underwriting_store.search_bonds(keyword)
+
+
+@tool
+def get_underwriting_announcement(announcement_no: str) -> dict:
+    """讀取指定序號的承銷公告完整細節（公告資訊、債券資訊、承銷金額
+    等）。序號從 search_underwriting_bonds 的結果取得。"""
+    result = underwriting_store.get_announcement(announcement_no)
+    return result or {"message": f"找不到序號 {announcement_no} 的公告"}
+
+
 TOOLS = [
     get_latest_report_status,
     get_report_history,
@@ -101,4 +127,7 @@ TOOLS = [
     list_regulation_pages,
     read_regulation_page,
     read_regulation_source,
+    list_underwriters_market_share,
+    search_underwriting_bonds,
+    get_underwriting_announcement,
 ]

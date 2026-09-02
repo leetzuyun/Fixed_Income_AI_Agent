@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 
 import pdfplumber
 import pandas as pd
-import fitz  # PyMuPDF, used for embedded image extraction
+import pymupdf  # PyMuPDF, used for embedded image extraction
 import win32com.client
 import pythoncom
 from pywintypes import com_error
@@ -80,7 +80,7 @@ def extract_pdf_content(path: str) -> ExtractedReport:
 
 def extract_embedded_images(path: str) -> list:
     results = []
-    doc = fitz.open(path)
+    doc = pymupdf.open(path)
     try:
         for page_index in range(len(doc)):
             page = doc[page_index]

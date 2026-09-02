@@ -1,13 +1,5 @@
 """
-orchestrator/chainlit_app.py
-Chainlit 版本的聊天介面，功能跟 orchestrator/streamlit_app.py 完全一
-樣，只是換了介面框架。agent 邏輯（orchestrator/langchain_agent.py、
-orchestrator/tools.py）完全沒有改動，純粹是介面層替換。
-
-比 Streamlit 版本多一個功能：每輪回答後，會把 agent 這輪呼叫了哪些工
-具、帶什麼參數、拿到什麼結果，用可展開的 Step 顯示出來——這是換成
-Chainlit 最主要的理由，同事可以看到「它剛剛是查了哪一頁法規、還是回頭
-讀了原始全文」，不是黑盒子直接吐答案。
+chainlit_app.py
 
 刻意不用 LangGraph 的即時串流（.stream() / astream_events()）：這類即
 時串流在 Chainlit 裡目前還有已知的效能與相容性問題（社群回報某些串流
@@ -19,11 +11,11 @@ agent.invoke() 完整跑完後，再把回傳的 messages 列表裡「這一輪�
 
 執行方式（從專案根目錄）：
     pip install chainlit
-    chainlit run orchestrator/chainlit_app.py
+    chainlit run chainlit_app.py
 
 預設只能在這台電腦上用瀏覽器開 http://localhost:8000。
 如果想讓同一區網內的同事也能連，加 --host 128.110.135.25：
-    chainlit run orchestrator/chainlit_app.py --host 128.110.135.25 --port 8000
+    chainlit run chainlit_app.py --host 128.110.135.25 --port 8000
 然後同事瀏覽器輸入「這台電腦的區網 IP:8000」（IP 可用 ipconfig 查）。
 Windows 防火牆可能會跳出詢問是否允許，記得允許。
 
@@ -44,7 +36,7 @@ if sys.version_info.major != 3 or sys.version_info.minor != 12:
 import chainlit as cl
 from orchestrator.langchain_agent import build_agent
 
-# 工具的技術名稱換成同事看得懂的中文標籤，顯示在 Step 標題上
+# 工具的技術名稱換成中文標籤，顯示在 Step 標題上
 TOOL_NAME_LABELS = {
     "get_latest_report_status": "查詢晨報狀態",
     "get_report_history": "查詢晨報歷史紀錄",

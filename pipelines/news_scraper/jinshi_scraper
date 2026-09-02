@@ -1,0 +1,58 @@
+from curl_cffi import requests
+
+def fetch_jinshi_flash_api():
+    url = "https://flash-api.jin10.com/get_flash_list"
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "x-app-id": "b284a4aea43e2e88",
+        "x-version": "1.0.0",
+        "Origin": "https://www.jin10.com",
+        "Referer": "https://www.jin10.com/"
+    }
+    
+    params = {
+        "channel": "-8200",
+        "vip": "1"
+    }
+    
+    try:
+        # 關鍵差異：加入 impersonate="chrome120" 來模擬真實 Chrome 瀏覽器的底層特徵
+        response = requests.get(
+            url, 
+            headers=headers, 
+            params=params, 
+            impersonate="chrome120", 
+            timeout=10
+        )
+        response.raise_for_status()
+        
+        data = response.json()
+        raw_list = data.get("data", [])
+        
+        news_feed = []
+        for item in raw_list:
+            content_info = item.get("data", {})
+            
+            # API 回傳的結構包含文字內容與標題
+            news_feed.append({
+                "id": item.get("id"),
+                "time": item.get("time"),
+                "title": content_info.get("title", ""),
+                "content": content_info.get("content", ""),
+                "pic": content_info.get("pic", ""),  # 若快訊附帶圖片
+                "type": item.get("type")
+            })
+            
+        return news_feed
+
+    except Exception as e:
+        print(f"API 請求失敗: {e}")
+        return []
+
+# 測試呼叫
+if __name__ == "__main__":
+    latest_news = fetch_jinshi_flash_api()
+    for news in latest_news[:5]:  # 印出最新 5 條
+        print(f"[{news['time']}] {news['title']}")
+        print(f"{news['content']}\n" + "-"*40)

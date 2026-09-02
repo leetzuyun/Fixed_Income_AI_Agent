@@ -20,7 +20,7 @@ OLLAMA_TIMEOUT_SECONDS = int(os.environ.get("OLLAMA_TIMEOUT_SECONDS", "1000"))
 
 # --- OpenAI (or OpenAI-compatible) connection -------------------------------
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "spade-gpt-5.4-nano")
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "spade-gpt-5.6-sol")
 OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://sinocloudsecchat-litellm-webapp-uat.azurewebsites.net")
 OPENAI_TIMEOUT_SECONDS = int(os.environ.get("OPENAI_TIMEOUT_SECONDS", "180"))
 
