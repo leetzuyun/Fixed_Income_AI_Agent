@@ -32,6 +32,7 @@ def _build_llm():
             model=config.OPENAI_MODEL,
             api_key=config.OPENAI_API_KEY,
             base_url=config.OPENAI_BASE_URL,
+            output_version="responses/v1",
         )
     if config.LLM_PROVIDER == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
@@ -44,7 +45,7 @@ def _build_llm():
 
 
 SYSTEM_PROMPT = (
-    "你是一個具備三種能力的助理：\n"
+    "你是一個具備五種能力的助理：\n"
     "1. 晨報操作——查詢晨報執行狀態、查看歷史紀錄、手動觸發今日晨報產製。\n"
     "2. 法規知識庫問答——用 list_regulation_pages 先看有哪些頁面，判斷"
     "跟問題相關的頁面後，用 read_regulation_page 讀該頁摘要。這個摘要是"
@@ -52,13 +53,23 @@ SYSTEM_PROMPT = (
     "檻，或摘要明顯沒有涵蓋到問題需要的細節，改用該頁 frontmatter 裡的"
     "source_file 欄位呼叫 read_regulation_source 讀原始全文再回答，不要"
     "在摘要不足時直接用猜的或用摘要內容硬答。\n"
-    "3. 一般知識庫問答——在另一組獨立的個人知識庫中做語意檢索並回答問"
-    "題，這組資料跟晨報、法規都無關，只在使用者的問題明顯不是法規、也不"
-    "是晨報時才用。\n"
+    "3. 承銷公告資料查詢——用 list_underwriters_market_share 查承銷商的"
+    "案件數、金額總計、市占率（可指定民國年，例如 \"115\"）；用"
+    "search_underwriting_bonds 依債券名稱或發行人關鍵字搜尋案件；用"
+    "get_underwriting_announcement 讀單一公告的完整細節。市占率計算不含"
+    "匯率換算，只計算台幣計價案件，如果查詢結果裡"
+    "excluded_non_twd_count 大於 0，回答時要提醒使用者有幾筆非台幣案件"
+    "沒有算進市占率。\n"
+    "4. 一般知識庫問答——在另一組獨立的個人知識庫中做語意檢索並回答問"
+    "題，這組資料跟晨報、法規、承銷公告都無關，只在使用者的問題明顯不"
+    "屬於前三種時才用。\n"
+    "5. 網路搜尋——問到即時性資訊（今天的市場行情、最近的新聞、公司內"
+    "部知識庫查不到的一般時事）才用，前四種能力查得到的問題不要優先用"
+    "網路搜尋，因為那些是內部資料，網路上查不到或不準確。\n"
     "請根據使用者問題的性質，判斷該呼叫哪一種工具。"
     "回答時使用繁體中文，簡潔明確，不要多餘的客套話。"
     "如果是引用知識庫或法規頁面的內容，請註明來源（頁面標題或知識庫來源"
-    "欄位）。"
+    "欄位）；如果是引用網路搜尋結果，請註明資料來源網址。"
 )
 
 

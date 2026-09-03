@@ -24,19 +24,10 @@ Windows 防火牆可能會跳出詢問是否允許，記得允許。
 CHAINLIT_AUTH_SECRET 環境變數跟一個 @cl.password_auth_callback，這支
 檔案先不加，之後真的需要再處理，不影響現在的邏輯。
 """
-import sys
-
-if sys.version_info.major != 3 or sys.version_info.minor != 12:
-    print("❌ 錯誤：本專案必須使用 Python 3.12！")
-    print(f"您目前的版本是：{sys.version_info.major}.{sys.version_info.minor}")
-    print("請安裝 Python 3.12 並重新建立虛擬環境。")
-    sys.exit(1)
-
-
 import chainlit as cl
 from orchestrator.langchain_agent import build_agent
+from orchestrator.message_utils import extract_answer_text
 
-# 工具的技術名稱換成中文標籤，顯示在 Step 標題上
 TOOL_NAME_LABELS = {
     "get_latest_report_status": "查詢晨報狀態",
     "get_report_history": "查詢晨報歷史紀錄",
@@ -45,6 +36,9 @@ TOOL_NAME_LABELS = {
     "list_regulation_pages": "列出法規頁面",
     "read_regulation_page": "讀取法規頁面摘要",
     "read_regulation_source": "讀取法規原始全文",
+    "list_underwriters_market_share": "查詢承銷商市占率",
+    "search_underwriting_bonds": "搜尋承銷公告",
+    "get_underwriting_announcement": "讀取承銷公告細節",
 }
 
 
@@ -55,17 +49,26 @@ async def on_chat_start():
     cl.user_session.set("history", [])
     await cl.Message(
         content=(
-            "金交處助理已啟動。可以問晨報狀態、觸發今天的報告，"
-            "或問法規／知識庫裡的內容。"
+            "🤖 金交處助理已啟動。可以問晨報狀態、觸發今天的報告，"
+            "問法規／知識庫裡的內容，或問搜尋網路資訊。"
         )
     ).send()
 
 
 async def _show_tool_steps(result_messages: list, already_shown: int):
     """把 agent.invoke() 回傳的完整 messages 裡，這一輪新增的部分挑出
-    工具呼叫（ToolMessage），用可展開的 Step 顯示呼叫參數跟結果。
-    already_shown 是這一輪呼叫前 history 的長度，用來只挑出這一輪新增
-    的訊息，不重複顯示之前輪次的工具呼叫。"""
+    工具呼叫，用可展開的 Step 顯示呼叫參數跟結果。already_shown 是這一
+    輪呼叫前 history 的長度，用來只挑出這一輪新增的訊息，不重複顯示之
+    前輪次的工具呼叫。
+
+    兩種工具呼叫要分開處理：
+      1. 我們自己寫的 @tool 函式（orchestrator/tools.py 那 10 個）：
+         LangChain 會產生獨立的 ToolMessage，直接挑出來顯示。
+      2. openai 的 web_search：這是 OpenAI 伺服器端執行的內建工具，不
+         會產生 ToolMessage，而是嵌在 AIMessage.content 的內容區塊列
+         表裡（見 message_utils.py 的說明），要另外從那裡挑出
+         "web_search_call" 類型的區塊顯示。
+    """
     new_messages = result_messages[already_shown:]
 
     # 先建立 tool_call_id -> 呼叫參數 的對照，等一下要跟結果配對
@@ -75,14 +78,25 @@ async def _show_tool_steps(result_messages: list, already_shown: int):
             pending_calls[call["id"]] = call
 
     for msg in new_messages:
-        if getattr(msg, "type", None) != "tool":
+        if getattr(msg, "type", None) == "tool":
+            call = pending_calls.get(getattr(msg, "tool_call_id", None), {})
+            tool_name = call.get("name") or getattr(msg, "name", "unknown_tool")
+            label = TOOL_NAME_LABELS.get(tool_name, tool_name)
+            async with cl.Step(name=label, type="tool") as step:
+                step.input = call.get("args", {})
+                step.output = str(msg.content)
             continue
-        call = pending_calls.get(getattr(msg, "tool_call_id", None), {})
-        tool_name = call.get("name") or getattr(msg, "name", "unknown_tool")
-        label = TOOL_NAME_LABELS.get(tool_name, tool_name)
-        async with cl.Step(name=label, type="tool") as step:
-            step.input = call.get("args", {})
-            step.output = str(msg.content)
+
+        content = getattr(msg, "content", None)
+        if not isinstance(content, list):
+            continue
+        for block in content:
+            if not isinstance(block, dict) or block.get("type") != "web_search_call":
+                continue
+            action = block.get("action") or {}
+            queries = action.get("queries") or [action.get("query", "")]
+            async with cl.Step(name="網路搜尋", type="tool") as step:
+                step.output = "、".join(q for q in queries if q) or "（無查詢字串）"
 
 
 @cl.on_message
@@ -98,7 +112,7 @@ async def on_message(message: cl.Message):
 
     await _show_tool_steps(result_messages, already_shown=messages_before)
 
-    answer = result_messages[-1].content
+    answer = extract_answer_text(result_messages[-1])
     history.append({"role": "assistant", "content": answer})
     cl.user_session.set("history", history)
 

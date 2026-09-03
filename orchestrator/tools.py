@@ -13,6 +13,7 @@ import threading
 
 from langchain_core.tools import tool
 
+import infra.config as config
 import infra.status_store as status
 from pipelines.market_report.runner import run_pipeline
 import domains._shared.rag_store as rag_store
@@ -131,3 +132,12 @@ TOOLS = [
     search_underwriting_bonds,
     get_underwriting_announcement,
 ]
+
+# OpenAI 的 web_search 是伺服器端執行的內建工具（不是我們自己寫的
+# @tool 函式），用一個 dict 表示，create_agent 認得這個格式、知道要走
+# Responses API（見 langchain_agent.py 的 _build_llm() 註解）。這個工具
+# 規格是 OpenAI 專屬的，Gemini/Ollama 沒有對應的內建工具，所以只在
+# LLM_PROVIDER 是 openai 時才加進 TOOLS，避免切到其他 provider 時傳一個
+# 對方看不懂的工具規格進去。
+if config.LLM_PROVIDER == "openai":
+    TOOLS.append({"type": "web_search"})
