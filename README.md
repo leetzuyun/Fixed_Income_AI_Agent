@@ -42,6 +42,9 @@ chainlit run chainlit_app.py
 *注意：法規 pdf 儲存在 `domains/regulation_kb/sources/`  
 若該資料夾有增減需要輸入此指令以重新整合 `python -m pipelines.regulation_wiki.runner` (也可透過 Obsidian 手動整理)*
 
+### 3. web_search
+* 搜尋外網資料(使用 OpenAI 模型內建)
+
 ## 待開發
 ### 1. market_report
 * 資料來源

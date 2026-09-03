@@ -63,3 +63,7 @@ ENABLE_CHARTS = os.environ.get("ENABLE_CHARTS", "false").lower() == "true"
 
 # --- Report output ---------------------------------------------------------
 REPORT_TITLE = os.environ.get("REPORT_TITLE", "Daily Fixed Income Report Digest")
+
+# --- LSEG MCP connection ---------------------------------------------------------
+LSEG_CLIENT_ID = "XX-XXXXXXXXXX"
+LSEG_CLIENT_SECRET = "YYYYYYYY-YYYY-YYYY-YYYY-YYYYYYYYYYYY"
